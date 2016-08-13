@@ -40,8 +40,8 @@ public class Main : MonoBehaviour
     }
     void FixedUpdate()
     {
-        PreviousAcc = Vector3.Lerp(PreviousAcc, Input.gyro.userAcceleration, 0.02f);
-        FollowerTransform.position = Camera.main.transform.TransformVector(-PreviousAcc*10);
+        PreviousAcc = Vector3.Lerp(PreviousAcc, Input.gyro.userAcceleration, 0.002f);
+        FollowerTransform.position = Camera.main.transform.TransformVector(-PreviousAcc*50);
 
     }
 }
