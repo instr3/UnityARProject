@@ -1,15 +1,101 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿/*==============================================================================
+Copyright (c) 2010-2014 Qualcomm Connected Experiences, Inc.
+All Rights Reserved.
+Confidential and Proprietary - Protected under copyright and other laws.
+==============================================================================*/
 
-public class FollowingTrackableEventHandler : MonoBehaviour {
+using UnityEngine;
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+namespace Vuforia
+{
+    /// <summary>
+    /// A custom handler that implements the ITrackableEventHandler interface.
+    /// </summary>
+    public class FollowingTrackableEventHandler : MonoBehaviour,
+                                                ITrackableEventHandler
+    {
+        #region PRIVATE_MEMBER_VARIABLES
+
+        private TrackableBehaviour mTrackableBehaviour;
+
+        #endregion // PRIVATE_MEMBER_VARIABLES
+        public Transform werewolfTransform;
+        public Vector3 targetPosition;
+        private float separateDistance;
+        private Animator animator;
+        private bool found = false, separated = false;
+        private Vector3 smoothVelocity = Vector3.zero;
+        private Vector3 arCameraPosition;
+
+        #region UNTIY_MONOBEHAVIOUR_METHODS
+
+        void Start()
+        {
+            mTrackableBehaviour = GetComponent<TrackableBehaviour>();
+            if (mTrackableBehaviour)
+            {
+                mTrackableBehaviour.RegisterTrackableEventHandler(this);
+            }
+            arCameraPosition = MainController.ARCamera.GetComponentInChildren<Camera>().transform.position;
+            separateDistance = Vector3.Distance(arCameraPosition, targetPosition);
+        }
+
+        #endregion // UNTIY_MONOBEHAVIOUR_METHODS
+
+        void Update()
+        {
+            if(found)
+            {
+                Debug.Log(separateDistance);
+                if(Vector3.Distance(werewolfTransform.position, arCameraPosition) >separateDistance)
+                {
+                    separated = true;
+                    animator.SetBool("Walk", true);
+                    werewolfTransform.SetParent(null);
+                    smoothVelocity = Vector3.zero;
+                }
+                if(separated)
+                {
+                    werewolfTransform.position =
+                        Vector3.SmoothDamp(werewolfTransform.position, targetPosition, ref smoothVelocity, 3f);
+                }
+            }
+        }
+
+        #region PUBLIC_METHODS
+
+        /// <summary>
+        /// Implementation of the ITrackableEventHandler function called when the
+        /// tracking state changes.
+        /// </summary>
+        public void OnTrackableStateChanged(
+                                        TrackableBehaviour.Status previousStatus,
+                                        TrackableBehaviour.Status newStatus)
+        {
+            if (animator == null)
+            {
+                animator = GetComponentInChildren<Animator>();
+            }
+            if (newStatus == TrackableBehaviour.Status.DETECTED ||
+                newStatus == TrackableBehaviour.Status.TRACKED ||
+                newStatus == TrackableBehaviour.Status.EXTENDED_TRACKED)
+            {
+                animator.SetBool("Hide", false);
+                animator.SetBool("Show", true);
+                found = true;
+            }
+            else if(!separated)
+            {
+                animator.SetBool("Walk", false);
+                animator.SetBool("Show", false);
+                animator.SetBool("Hide", true);
+                found = false;
+            }
+        }
+
+        #endregion // PUBLIC_METHODS
+
+
+
+    }
 }
