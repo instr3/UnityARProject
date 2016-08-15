@@ -13,6 +13,10 @@ public class TrackableObject
     {
         prefabObject = obj;
         trackableEventHandeler = obj.GetComponent<ITrackableEventHandler>();
+        if(trackableEventHandeler==null)
+        {
+            Debug.LogError(obj.name + " is an invalid image target.");
+        }
     }
     
     public void Instantiate()

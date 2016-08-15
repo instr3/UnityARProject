@@ -54,14 +54,14 @@ namespace Vuforia
                     separated = true;
                     animator.SetBool("Walk", true);
                     werewolfTransform.SetParent(null);
-                    smoothVelocity = new Vector3();
+                    smoothVelocity = Vector3.up * 2;
                     finalPosition = targetPosition - Vector3.up * initHeight;
                 }
                 if(separated)
                 {
                     Debug.Log(werewolfTransform.position.ToString() + ":" + finalPosition.ToString() + ":" + smoothVelocity);
                     werewolfTransform.position =
-                        Vector3.SmoothDamp(werewolfTransform.position, finalPosition, ref smoothVelocity, 3f,2f,Time.deltaTime);
+                        Vector3.SmoothDamp(werewolfTransform.position, finalPosition, ref smoothVelocity, 1f,float.PositiveInfinity,Time.deltaTime);
                 }
             }
         }
