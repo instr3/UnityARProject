@@ -26,6 +26,8 @@ namespace Vuforia
         private bool found = false, separated = false;
         private Vector3 smoothVelocity = Vector3.zero;
         private Vector3 arCameraPosition;
+        public float initHeight;
+        private Vector3 finalPosition;
 
         #region UNTIY_MONOBEHAVIOUR_METHODS
 
@@ -52,12 +54,14 @@ namespace Vuforia
                     separated = true;
                     animator.SetBool("Walk", true);
                     werewolfTransform.SetParent(null);
-                    smoothVelocity = Vector3.zero;
+                    smoothVelocity = new Vector3();
+                    finalPosition = targetPosition - Vector3.up * initHeight;
                 }
                 if(separated)
                 {
+                    Debug.Log(werewolfTransform.position.ToString() + ":" + finalPosition.ToString() + ":" + smoothVelocity);
                     werewolfTransform.position =
-                        Vector3.SmoothDamp(werewolfTransform.position, targetPosition, ref smoothVelocity, 3f);
+                        Vector3.SmoothDamp(werewolfTransform.position, finalPosition, ref smoothVelocity, 3f,2f,Time.deltaTime);
                 }
             }
         }
